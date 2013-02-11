@@ -12,14 +12,21 @@
   (max-y 0 :type integer))
 
 (defun thing-at (vector level)
-  (flet ((member-equalp (thing things)
-           (member thing things :test #'equalp)))
-    (cond
-      ((member-equalp vector (level-walls level))
-        'wall)
-      ((member-equalp vector (level-crates level))
-        'crate)
-      (t 'empty))))
+  (cond
+    ((wallp vector level)
+     'wall)
+    ((cratep vector level)
+     'crate)
+    (t 'empty)))
+
+(flet ((member-equalp (thing things)
+         (member thing things :test #'equalp)))
+  (defun wallp (vector level)
+    (member-equalp vector (level-walls level)))
+  (defun cratep (vector level)
+    (member-equalp vector (level-crates level)))
+  (defun storagep (vector level)
+    (member-equalp vector (level-storage level))))
 
 (defun level-from-string (string)
   (declare (optimize (debug 3)))
@@ -45,6 +52,16 @@
           finally (setf (level-max-x level) max-x
                         (level-max-y level) max-y))
     level))
+
+(defun print-level (level)
+  (dotimes (x (level-max-x level))
+    (dotimes (y (level-max-y level))
+      (princ (case (thing-at (vector x y))
+               (wall #\#)
+               ))
+      )
+    )
+  )
 
 (defun move-from-char (char level)
   (case char
