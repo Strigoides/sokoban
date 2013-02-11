@@ -27,6 +27,8 @@
     (member-equalp vector (level-crates level)))
   (defun storagep (vector level)
     (member-equalp vector (level-storage level))))
+(defun manp (vector level)
+  (equalp (level-man level) vector))
 
 (defun level-from-string (string)
   (declare (optimize (debug 3)))
@@ -56,12 +58,19 @@
 (defun print-level (level)
   (dotimes (x (level-max-x level))
     (dotimes (y (level-max-y level))
-      (princ (case (thing-at (vector x y))
-               (wall #\#)
-               ))
-      )
-    )
-  )
+      (let ((here (vector x y)))
+        (princ (cond
+                 ((wallp here level)
+                  #\#)
+                 ((cratep here level)
+                  (if (storagep here level)
+                    #\*
+                    #\o))
+                 ((storagep here level)
+                  (if (manp here level)
+                    #\+
+                    #\.)))))
+      (princ #\Newline)))) 
 
 (defun move-from-char (char level)
   (case char
