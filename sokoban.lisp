@@ -85,7 +85,8 @@
     (#\w (move level #(0 -1)))
     (#\a (move level #(-1 0)))
     (#\s (move level #(0 1)))
-    (#\d (move level #(1 0)))))
+    (#\d (move level #(1 0)))
+    (otherwise level)))
 
 (defun move (level delta)
   (let ((man (level-man level)))
@@ -103,12 +104,14 @@
               (progn
                 (setf (level-man level)
                       (vector-+ man delta))
-                (remove (vector-+ man delta) 
-                        (level-crates level) 
-                        :test #'equalp) 
+                (setf (level-crates level)
+                      (delete (vector-+ man delta)
+                              (level-crates level) 
+                              :test #'equalp)) 
                 (push next-square (level-crates level))
                 level))
-            (otherwise level)))))))
+            (otherwise level))))))
+  level)
 
 (defun level-complete-p (level)
   (flet ((vector< (v1 v2)
@@ -118,3 +121,10 @@
 
 (defun vector-+ (v1 v2)
   (map 'vector #'+ v1 v2))
+
+(defun play (level-string)
+  (let ((level (level-from-string level-string)))
+    (loop until (level-complete-p level) do
+          (print-level level)
+          (setf level (move-from-char (read-char) level))
+          finally (print "Good job, you won!"))))
