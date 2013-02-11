@@ -110,5 +110,11 @@
                 level))
             (otherwise level)))))))
 
+(defun level-complete-p (level)
+  (flet ((vector< (v1 v2)
+           (every #'< v1 v2)))
+    (equalp (sort (level-crates level) #'vector<)
+            (sort (level-storage level) #'vector<))))
+
 (defun vector-+ (v1 v2)
   (map 'vector #'+ v1 v2))
