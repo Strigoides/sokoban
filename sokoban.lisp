@@ -11,6 +11,11 @@
   (max-x 0 :type integer)
   (max-y 0 :type integer))
 
+(defvar *test-level-string*
+  "#####
+#.o@#
+#####")
+
 (defun thing-at (vector level)
   (cond
     ((wallp vector level)
@@ -38,7 +43,7 @@
           with y = 0 maximizing y into max-y
           when (char= char #\Newline)
             do (incf y)
-            and do (setf x 0)
+            and do (setf x -1)
           else
           do (let ((here (vector x y)))
                (ecase char
@@ -56,8 +61,8 @@
     level))
 
 (defun print-level (level)
-  (dotimes (x (level-max-x level))
-    (dotimes (y (level-max-y level))
+  (dotimes (y (1+ (level-max-y level)))
+    (dotimes (x (1+ (level-max-x level)))
       (let ((here (vector x y)))
         (princ (cond
                  ((wallp here level)
@@ -69,8 +74,11 @@
                  ((storagep here level)
                   (if (manp here level)
                     #\+
-                    #\.)))))
-      (princ #\Newline)))) 
+                    #\.))
+                 ((manp here level)
+                  #\@)
+                 (t #\Space))))) 
+    (princ #\Newline))) 
 
 (defun move-from-char (char level)
   (case char
