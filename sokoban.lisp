@@ -128,3 +128,10 @@
           (print-level level)
           (setf level (move-from-char (read-char) level))
           finally (print "Good job, you won!"))))
+
+(defun play-file (pathname)
+  (play
+    (with-open-file (stream pathname)
+      (let ((out-string (make-string (file-length stream))))
+        (read-sequence out-string stream)
+        out-string))))
