@@ -31,3 +31,14 @@
                  (#\@ (setf (level-man level) here))
                  (#\Space))))
     level))
+
+(defun move-from-char (char level)
+  (case char
+    (#\w (move level #(0 -1)))
+    (#\a (move level #(-1 0)))
+    (#\s (move level #(0 1)))
+    (#\d (move level #(1 0)))))
+
+(defun move (level delta)
+  
+  )
