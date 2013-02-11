@@ -7,7 +7,9 @@
   (walls   '() :type list)
   (crates  '() :type list)
   (storage '() :type list)
-  (man (vector 0 0) :type (simple-vector 2)))
+  (man (vector 0 0) :type (simple-vector 2))
+  (max-x 0 :type integer)
+  (max-y 0 :type integer))
 
 (defun thing-at (vector level)
   (flet ((member-equalp (thing things)
@@ -23,8 +25,8 @@
   (declare (optimize (debug 3)))
   (let ((level (make-level)))
     (loop for char across string
-          for x from 0
-          with y = 0
+          for x from 0 maximizing x into max-x
+          with y = 0 maximizing y into max-y
           when (char= char #\Newline)
             do (incf y)
             and do (setf x 0)
@@ -39,7 +41,9 @@
                  (#\+ (push here (level-storage level))
                   (setf (level-man level) here))
                  (#\@ (setf (level-man level) here))
-                 (#\Space))))
+                 (#\Space)))
+          finally (setf (level-max-x level) max-x
+                        (level-max-y level) max-y))
     level))
 
 (defun move-from-char (char level)
