@@ -9,6 +9,16 @@
   (storage '() :type list)
   (man (vector 0 0) :type (simple-vector 2)))
 
+(defun thing-at (vector level)
+  (flet ((member-equalp (thing things)
+           (member thing things :test #'equalp)))
+    (cond
+      ((member-equalp vector (level-walls level))
+        'wall)
+      ((member-equalp vector (level-crates level))
+        'crate)
+      (t 'empty))))
+
 (defun level-from-string (string)
   (declare (optimize (debug 3)))
   (let ((level (make-level)))
@@ -40,5 +50,27 @@
     (#\d (move level #(1 0)))))
 
 (defun move (level delta)
-  
-  )
+  (let ((man (level-man level)))
+    (case (thing-at (vector-+ man delta) level)
+      (empty
+        (progn (setf (level-man level)
+                     (vector-+ man delta))
+               level))
+      (wall level)
+      (crate
+        (let ((next-square (vector-+ man (vector-+ delta
+                                                   delta))))
+          (case (thing-at next-square level)
+            (empty
+              (progn
+                (setf (level-man level)
+                      (vector-+ man delta))
+                (remove (vector-+ man delta) 
+                        (level-crates level) 
+                        :test #'equalp) 
+                (push next-square (level-crates level))
+                level))
+            (otherwise level)))))))
+
+(defun vector-+ (v1 v2)
+  (map 'vector #'+ v1 v2))
